@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const escpos = require("escpos");
-escpos.USB = require("escpos-usb");
+const { Printer } = require("@node-escpos/core");
+const USB = require("@node-escpos/usb-adapter");
 
 let mainWindow;
 
@@ -19,9 +19,9 @@ app.whenReady().then(() => {
 // Función para imprimir el ticket
 ipcMain.on("imprimir-ticket", (event, datos) => {
   try {
-    const device = new escpos.USB();
+    const device = new USB();
     const options = { encoding: "GB18030" };
-    const printer = new escpos.Printer(device, options);
+    let printer = new Printer(device, options);
 
     device.open((error) => {
       if (error) {
