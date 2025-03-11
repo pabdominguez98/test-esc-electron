@@ -23,36 +23,32 @@ ipcMain.on("imprimir-ticket", (event, datos) => {
     const options = { encoding: "GB18030" };
     let printer = new Printer(device, options);
 
-    device.open((error) => {
+    device.open(async (error) => {
       if (error) {
         console.error("Error abriendo la impresora:", error);
         return;
       }
-
       printer
+        .font("a")
         .align("ct")
-        .style("b")
-        .size(1, 1)
-        .text("Bienvenido a Dupin")
-        .text("")
-        .style("normal")
-        .size(1, 1)
-        .text("Te van a llamar con el número")
-        .text("")
         .style("bu")
-        .size(2, 2)
-        .text(datos.numeroTurno)
-        .text("")
         .size(1, 1)
-        .text("Escanea este código QR")
-        .qrimage(`https://dupinsystem.com/turno/${datos.turnoID}`, function (err) {
-          if (err) {
-            console.error("Error generando QR:", err);
-          }
-
-          this.cut();
-          this.close();
-        });
+        .text("May the gold fill your pocket")
+        .text("恭喜发财")
+        .barcode(112233445566, "EAN13", { width: 50, height: 50 })
+        .table(["One", "Two", "Three"])
+        .tableCustom(
+          [
+            { text: "Left", align: "LEFT", width: 0.33, style: "B" },
+            { text: "Center", align: "CENTER", width: 0.33 },
+            { text: "Right", align: "RIGHT", width: 0.33 },
+          ],
+          { encoding: "cp857", size: [1, 1] }, // Optional
+        )
+      printer = await printer.qrimage("https://github.com/node-escpos/driver")
+      printer
+        .cut()
+        .close()
     });
   } catch (err) {
     console.error("No se encontró una impresora USB:", err);
